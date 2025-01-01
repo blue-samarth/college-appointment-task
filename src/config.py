@@ -21,9 +21,16 @@ class Config:
         """
         It is a method that adds secret key in environment
         """
-        if not os.path.exists('core/.env'):
-            with open('core/.env', 'w') as f:
+        if not os.path.exists('src/.env'):
+            with open('src/.env', 'w') as f:
                 f.write(f'SECRET_KEY={self.SECRET_KEY}')
+        elif os.path.exists('src/.env'):
+            with open('src/.env', 'r') as f:
+                if 'SECRET_KEY' not in f.read():
+                    with open('src/.env', 'a') as f:
+                        f.write(f'SECRET_KEY={self.SECRET_KEY}')
+        else:
+            print("Error in adding secret key in environment")
 
 
 if __name__ == "__main__":
