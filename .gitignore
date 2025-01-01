@@ -2,3 +2,9 @@
 # samarthsam38
 
 .env
+.venv
+# all the cache files
+*.log
+*.cache
+*.data
+.mypy_cache/
