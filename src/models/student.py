@@ -20,7 +20,7 @@ class Student(BaseModel):
     enrolled_courses : dict = {}
 
     @classmethod
-    async def create_student(cls, student: BaseModel) -> dict:
+    async def create_student(cls) -> dict:
         """
         It is a class method that creates a student
         param student: Student: student object

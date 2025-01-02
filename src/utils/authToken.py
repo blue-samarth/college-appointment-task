@@ -6,43 +6,31 @@ import jwt
 from pydantic import BaseModel
 
 from src import SECRET_KEY
+from src.utils.exception import MinorException
 
-class AuthUser(BaseModel):
+
+class Token(BaseModel):
+    """
+    It is a class to generate and verify tokens.
+    """
     user_id : str
     exp : int
     role : str
 
-
-class Token():
-    """
-    It is a class to generate and verify tokens.
-    """
-
-    def __init__(self , user_id : str , role: str , exp : int = 60):
+    @classmethod
+    async def create_token(cls) -> str:
         """
         Constructor for baseToken class.
         Args:
-            user_id (str): User ID.
-            exp (datetime): Expiry time.
+            user_id : str: User ID.
+            exp : int : Expiry time.
+            role : str : Role.
         """
-        self.user_id = user_id
-        self.exp = exp
-        self.role = role
-    
-
-    def generate_token(self) -> str:
-        """
-        Function to generate token.
-        Returns:
-            str: Token.
-        """
-        expire : datetime = datetime.now() + timedelta(self.exp)
-        token = jwt.encode({"user_id": self.user_id , "exp": expire , "role": self.role} ,
-                            SECRET_KEY , algorithm="HS256")
+        token = jwt.encode(cls.dict() , SECRET_KEY , algorithm="HS256")
         return token
 
-
-    def decode_token(self , token : str) -> dict:
+    @staticmethod
+    def decode_token(token : str) -> dict:
         """
         Function to decode token.
         Args:
@@ -74,7 +62,7 @@ class Token():
         token : str = request.headers.get("Authorization")
         if not token: 
             logging.error("Token is missing")
-            return {"error": "Token is missing"}
+            raise MinorException(status_code=401, message="Token is missing")
         if token.startswith("Bearer "):
             token = token.split("Bearer ")[1]
         try:
@@ -82,10 +70,10 @@ class Token():
             return payload
         except jwt.ExpiredSignatureError:
             logging.error("Token has expired")
-            return {"error": "Token has expired"}
+            raise MinorException(status_code=401, message="Token has expired")
         except jwt.InvalidTokenError:
             logging.error("Invalid token")
-            return {"error": "Invalid token"}
+            raise MinorException(status_code=401, message="Token is invalid")
         except Exception as e:
             logging.error(f"Error in decoding token: {e}")
-            return {"error": f"Error in decoding token: {e}"}
+            raise MinorException(status_code=401, message="Error in decoding token")
