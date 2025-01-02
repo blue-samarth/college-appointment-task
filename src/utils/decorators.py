@@ -35,13 +35,17 @@ def verify_payload(role: str) -> Callable[..., T]:
             try:
                 if payload.get('role') == role:
                     return await func(request, payload, *args, **kwargs)
+                
                 raise MinorException("Unauthorized access")
+            
             except MinorException as e:
                 logging.error(f"Error in verifying payload: {e}")
                 raise HTTPException(status_code=403, detail=str(e))
+            
             except Exception as e:
                 logging.error(f"Error in verifying payload: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
+            
         return wrapper
     return decorator
 
