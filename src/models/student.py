@@ -1,6 +1,7 @@
 
 import datetime
 import logging
+from typing import Dict, Optional
 
 from pydantic import BaseModel , Field 
 from fastapi import HTTPException
@@ -15,9 +16,9 @@ class Student(BaseModel):
     name : int
     email : str
     password : str
-    enrollment_no : int = Field(default_factory=int)
+    enrollment_no : Optional[int] = Field(default_factory=int)
     created_at : datetime.datetime = Field(default_factory=datetime.datetime.now)
-    enrolled_courses : dict = {}
+    enrolled_courses : Optional[Dict[str]] = Field(default_factory=list)
 
     @classmethod
     async def create_student(cls) -> dict:
@@ -39,6 +40,16 @@ class Student(BaseModel):
             }
         """
         try:
+            # Check if the student already exists
+            student = await db['students'].find_one({"email": student.email})
+            if student:
+                raise HTTPException(status_code=400, detail="Student already exists")
+            if await db['students'] == None:
+                enrollment_no : int = 1
+            else:
+                last_student : dict = await db['students'].find_one(sort=[("enrollment_no", -1)])
+                enrollment_no = last_student['enrollment_no'] + 1
+            student = cls(name=student.name, email=student.email, password=student.password, enrollment_no=enrollment_no)
             student = await db['students'].insert_one(student.dict())
             return student.dict()
         except Exception as e:
