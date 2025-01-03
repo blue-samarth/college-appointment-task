@@ -40,7 +40,7 @@ class Professor(BaseModel):
         """
         try:
             time_slots = {
-                f"i" : {"status": "free", "student_id": None} for i in range(8, 18)
+                f"{i}" : {"status": "free", "student_id": None} for i in range(8, 18)
             }
             professor_data = professor.dict()
             professor_data['time_slots'] = time_slots
@@ -201,7 +201,7 @@ class Professor(BaseModel):
         professor = await db["professors"].find_one({"_id": ObjectId(professor_id)})
         if professor:
             professor["time_slots"] = {
-                f"i" : {"status": "free", "student_id": None} for i in range(8, 18)
+                f"{i}" : {"status": "free", "student_id": None} for i in range(8, 18)
             }
             await db["professors"].update_one({"_id": ObjectId(professor_id)}, {"$set": professor})
             return professor["time_slots"]

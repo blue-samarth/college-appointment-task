@@ -4,10 +4,11 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status , Request
 from fastapi.responses import JSONResponse
 
-from src import app 
 from src.models.student import Student
+from src.models.professor import Professor
 from src.utils.responses import APIResponse
 from src.utils.password_handle import PasswordHandle
+from src.utils.authToken import Token
 
 router = APIRouter()
 
@@ -34,7 +35,7 @@ async def signup(student: Student) -> APIResponse:
     try:
         student.password = PasswordHandle().get_password_hash(student.password)
         student = await Student.create_student(student)
-        return APIResponse(status="success", message="Student created successfully")
+        return APIResponse(status="success", message="Student created successfully" , data = student)
     except Exception as e:
         logging.error(f"Error in creating student: {e}")
         raise HTTPException(status_code=500, detail=f"Error in creating student: {e}")
@@ -55,21 +56,27 @@ async def login_student(request: Request) -> APIResponse:
         enrollment_no : int = request.query_params['enrollment_no']
         password : str = request.query_params['password']
         student = await Student.get_student(enrollment_no)
+        token = Token(user_id=student['enrollment_no'] , exp=datetime.now() , role="student").generate_token()
         if not student:
             raise HTTPException(status_code=400, detail="Student does not exist")
         if not PasswordHandle().verify_password(password, student['password']):
             raise HTTPException(status_code=400, detail="Invalid password")
-        return APIResponse(status="success", message="Student logged in successfully")
+        return APIResponse(status="success", message="Student logged in successfully" , data = student , token = token)
     except Exception as e:
         logging.error(f"Error in getting student: {e}")
         raise HTTPException(status_code=500, detail=f"Error in getting student: {e}")
     
 
-@router.get("/get_student" , response_model=APIResponse)
-async def get_student(request: Request) -> APIResponse:
+@router.post("/signup_prof" , response_model=APIResponse)
+async def signup_prof(professor: Professor) -> APIResponse:
     """
-    It is a route that gets a student
-    param enrollment_no: int: enrollment number
+    It is a route that creates a professor
+    param professor: Professor: professor object
+        {
+        'name': str,
+        'email': str,
+        'password': str
+        }
     returns: APIResponse: APIResponse object
         {
         'status': str,
@@ -77,9 +84,9 @@ async def get_student(request: Request) -> APIResponse:
         }
     """
     try:
-        enrollment_no : int = request.query_params['enrollment_no']
-        student = await Student.get_student(enrollment_no)
-        return APIResponse(status="success", message=student)
+        professor.password = PasswordHandle().get_password_hash(professor.password)
+        professor = await Professor.create_professor(professor)
+        return APIResponse(status="success", message="Professor created successfully")
     except Exception as e:
-        logging.error(f"Error in getting student: {e}")
-        raise HTTPException(status_code=500, detail=f"Error in getting student: {e}")
+        logging.error(f"Error in creating professor: {e}")
+        raise HTTPException(status_code=500, detail=f"Error in creating professor: {e}")

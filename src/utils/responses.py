@@ -13,7 +13,7 @@ class APIResponse(BaseModel):
     status_code: int
 
     @classmethod
-    def respond(cls , status_code : int , status : str , message : str , data : Optional[Any] = None) -> JSONResponse:
+    def respond(cls , status_code : int , status : str , message : str , data : Optional[Any] = None , token : Optional[str] = None) -> JSONResponse:
         """
         Function to return a JSONResponse object.
         Args:
@@ -27,6 +27,7 @@ class APIResponse(BaseModel):
             content = {
                 "status": status,
                 "message": message,
-                "data": data,
+                "token" : token,
+                "data": data
             }
         )

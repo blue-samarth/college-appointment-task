@@ -18,15 +18,16 @@ class Token(BaseModel):
     role : str
 
     @classmethod
-    async def create_token(cls) -> str:
+    async def create_token(self) -> str:
         """
         Constructor for baseToken class.
         Args:
             user_id : str: User ID.
-            exp : int : Expiry time.
+            exp : datetime: Expiry time.
             role : str : Role.
         """
-        token = jwt.encode(cls.dict() , SECRET_KEY , algorithm="HS256")
+        self.exp = datetime.now() + timedelta(minutes=60)
+        token = jwt.encode(self.model_dump() , SECRET_KEY , algorithm="HS256")
         return token
 
     @staticmethod
