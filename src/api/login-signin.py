@@ -90,3 +90,30 @@ async def signup_prof(professor: Professor) -> APIResponse:
     except Exception as e:
         logging.error(f"Error in creating professor: {e}")
         raise HTTPException(status_code=500, detail=f"Error in creating professor: {e}")
+    
+
+@router.get("/login_prof" , response_model=APIResponse)
+async def login_prof(request: Request) -> APIResponse:
+    """
+    It is a route that gets a professor
+    param email: str: email
+    param password: str: password
+    returns: APIResponse: APIResponse object
+        {
+        'status': str,
+        'message': str
+        }
+    """
+    try:
+        email : str = request.query_params['email']
+        password : str = request.query_params['password']
+        professor = await Professor.get_professor(email)
+        token = Token(user_id=professor['email'] , exp=datetime.now() , role="professor").generate_token()
+        if not professor:
+            raise HTTPException(status_code=400, detail="Professor does not exist")
+        if not PasswordHandle().verify_password(password, professor['password']):
+            raise HTTPException(status_code=400, detail="Invalid password")
+        return APIResponse(status="success", message="Professor logged in successfully" , data = professor , token = token)
+    except Exception as e:
+        logging.error(f"Error in getting professor: {e}")
+        raise HTTPException(status_code=500, detail=f"Error in getting professor: {e}")
