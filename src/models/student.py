@@ -99,6 +99,44 @@ class Student(BaseModel):
             logging.error(f"Error in getting all students: {e}")
             raise HTTPException(status_code=500, detail=f"Error in getting all students: {e}")
         
+
+    @staticmethod
+    async def add_course(enrollment_no : int , time_slot : int , prof_name : str):
+        """
+        It is a class method that adds a course to a student
+        param enrollment_no: int: enrollment number
+        param time_slot: int: time slot
+        param prof_name: str: professor name
+        """
+        try:
+            student = await db['students'].find_one({"enrollment_no": enrollment_no})
+            if student:
+                student['enrolled_courses'][time_slot] = prof_name
+                await db['students'].update_one({"enrollment_no": enrollment_no}, {"$set": student})
+            else:
+                raise HTTPException(status_code=404, detail="Student not found")
+        except Exception as e:
+            logging.error(f"Error in adding course: {e}")
+            raise HTTPException(status_code=500, detail=f"Error in adding course: {e}")
+        
+    
+    @staticmethod
+    async def delete_course(enrollment_no : int , time_slot : int):
+        """
+        It is a class method that deletes a course of a student
+        """
+        try:
+            student = await db['students'].find_one({"enrollment_no": enrollment_no})
+            if student:
+                student['enrolled_courses'].pop(time_slot)
+                await db['students'].update_one({"enrollment_no": enrollment_no}, {"$set": student})
+            else:
+                raise HTTPException(status_code=404, detail="Student not found")
+        except Exception as e:
+            logging.error(f"Error in deleting course: {e}")
+            raise HTTPException(status_code=500, detail=f"Error in deleting course: {e}")
+
+
     @staticmethod
     async def delete_student(enrollment_no : int) -> dict:
         """
