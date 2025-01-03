@@ -18,7 +18,7 @@ class Student(BaseModel):
     password : str
     enrollment_no : Optional[int] = Field(default_factory=int)
     created_at : datetime.datetime = Field(default_factory=datetime.datetime.now)
-    enrolled_courses : Optional[Dict[str]] = Field(default_factory=list)
+    enrolled_courses: Optional[Dict[str, str]] = Field(default_factory=dict)
 
     @classmethod
     async def create_student(cls) -> dict:
