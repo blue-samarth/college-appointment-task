@@ -17,18 +17,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# load the environment variables
 load_dotenv()
-password = os.getenv("MONGO_PASSWORD")
+password : str = os.getenv("PASSWORD")
+SECRET_KEY : str = os.getenv("SECRET_KEY")
 
-client : AsyncIOMotorClient = AsyncIOMotorClient(os.getenv(f"mongodb+srv://samarthsam38:{password}@cluster0.vf2ar.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
+uri : str = f"mongodb+srv://samarthsam38:{password}@cluster0.vf2ar.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-# try:
-#     client.admin.command("ping")
-#     print("Connected to MongoDB")
-# except Exception as e:
-#     print(f"Error in connecting to MongoDB: {e}")
+client: AsyncIOMotorClient = AsyncIOMotorClient(uri)
 
 db = client['college_appointments']
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+@app.on_event("startup")
+async def startup_event():
+    """
+    Actions to perform when the app starts.
+    """
+    try:
+        await client.admin.command("ping")  # Test MongoDB connection
+        print("Connected to MongoDB Atlas")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB Atlas: {e}")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """
+    Actions to perform when the app shuts down.
+    """
+    client.close()
+    print("MongoDB connection closed")
+

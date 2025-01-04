@@ -1,4 +1,5 @@
 import uvicorn
+import asyncio 
 
 from src import app
 from src.api.signup_login import login_signin_router
@@ -14,6 +15,7 @@ def start():
     Run the application
     """
     print("Starting the application")
+    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
     uvicorn.run("app:app", host="127.0.0.1", port=8000 , reload=True)
 
 if __name__ == "__main__":
