@@ -35,7 +35,10 @@ async def signup(student: Student) -> APIResponse:
     try:
         student.password = PasswordHandle().get_password_hash(student.password)
         student = await Student.create_student(student)
-        return APIResponse(status="success", message="Student created successfully" , data = student)
+        return APIResponse(
+            status="success", 
+            message="Student created successfully" , 
+            data = student)
     except Exception as e:
         logging.error(f"Error in creating student: {e}")
         raise HTTPException(status_code=500, detail=f"Error in creating student: {e}")

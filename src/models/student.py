@@ -13,7 +13,7 @@ class Student(BaseModel):
     """
     It is a class that contains the student model
     """
-    name : int
+    name : str
     email : str
     password : str
     enrollment_no : Optional[int] = Field(default_factory=int)
@@ -21,7 +21,7 @@ class Student(BaseModel):
     enrolled_courses: Optional[Dict[str, str]] = Field(default_factory=dict)
 
     @classmethod
-    async def create_student(cls) -> dict:
+    async def create_student(cls , student) -> dict:
         """
         It is a class method that creates a student
         param student: Student: student object
@@ -44,14 +44,18 @@ class Student(BaseModel):
             student = await db['students'].find_one({"email": student.email})
             if student:
                 raise HTTPException(status_code=400, detail="Student already exists")
-            if await db['students'] == None:
+            students = await db['students'].find()
+            if not students:
                 enrollment_no : int = 1
             else:
                 last_student : dict = await db['students'].find_one(sort=[("enrollment_no", -1)])
                 enrollment_no = last_student['enrollment_no'] + 1
-            student = cls(name=student.name, email=student.email, password=student.password, enrollment_no=enrollment_no)
-            student = await db['students'].insert_one(student.dict())
+            student['enrollment_no'] = enrollment_no
+            student['created_at'] = datetime.datetime.now()
+            student['enrolled_courses'] = {}
+            await db['students'].insert_one(student)
             return student.dict()
+
         except Exception as e:
             logging.error(f"Error in creating student: {e}")
             raise HTTPException(status_code=500, detail=f"Error in creating student: {e}")
