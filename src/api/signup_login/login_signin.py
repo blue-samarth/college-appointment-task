@@ -37,6 +37,7 @@ async def signup(student: Student) -> APIResponse:
         student = await Student.create_student(student)
         return APIResponse(
             status="success", 
+            status_code=200,
             message="Student created successfully" , 
             data = student)
     except Exception as e:

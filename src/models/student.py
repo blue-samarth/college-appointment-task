@@ -40,21 +40,23 @@ class Student(BaseModel):
             }
         """
         try:
-            # Check if the student already exists
-            student = await db['students'].find_one({"email": student.email})
-            if student:
+            stud = await db['students'].find_one({"email": student.email})
+            if stud:
                 raise HTTPException(status_code=400, detail="Student already exists")
-            students = await db['students'].find()
-            if not students:
+            total_students = await db['students'].count_documents({})
+            if not total_students:
                 enrollment_no : int = 1
             else:
                 last_student : dict = await db['students'].find_one(sort=[("enrollment_no", -1)])
                 enrollment_no = last_student['enrollment_no'] + 1
-            student['enrollment_no'] = enrollment_no
-            student['created_at'] = datetime.datetime.now()
-            student['enrolled_courses'] = {}
-            await db['students'].insert_one(student)
-            return student.dict()
+            student_data = student.model_dump()  # or student.dict() for older Pydantic versions
+            student_data.update({
+                'enrollment_no': enrollment_no,
+                'created_at': datetime.datetime.now(),
+                'enrolled_courses': {}
+            })
+            await db['students'].insert_one(student_data)
+            return student_data
 
         except Exception as e:
             logging.error(f"Error in creating student: {e}")
