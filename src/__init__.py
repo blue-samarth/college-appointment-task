@@ -18,12 +18,12 @@ app.add_middleware(
 )
 
 load_dotenv()
-password : str = os.getenv("PASSWORD")
+URI : str = os.getenv("URI")
 SECRET_KEY : str = os.getenv("SECRET_KEY")
 
-uri : str = f"mongodb+srv://samarthsam38:{password}@cluster0.vf2ar.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# uri : str = f"mongodb+srv://samarthsam38:{password}@cluster0.vf2ar.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-client: AsyncIOMotorClient = AsyncIOMotorClient(uri)
+client: AsyncIOMotorClient = AsyncIOMotorClient(URI)
 
 db = client['college_appointments']
 

@@ -43,6 +43,7 @@ async def signup(student: Student) -> APIResponse:
     except Exception as e:
         logging.error(f"Error in creating student: {e}")
         raise HTTPException(status_code=500, detail=f"Error in creating student: {e}")
+
     
 
 @router.get("/login_student" , response_model=APIResponse)

@@ -55,8 +55,12 @@ class Student(BaseModel):
                 'created_at': datetime.datetime.now(),
                 'enrolled_courses': {}
             })
-            await db['students'].insert_one(student_data)
-            return student_data
+            result = await db['students'].insert_one(student_data)
+
+            inserted_student = await db['students'].find_one({"_id" : result.inserted_id})
+            inserted_student['_id'] = str(inserted_student['_id'])
+
+            return inserted_student
 
         except Exception as e:
             logging.error(f"Error in creating student: {e}")
