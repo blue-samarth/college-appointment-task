@@ -46,7 +46,7 @@ async def signup(student: Student) -> APIResponse:
 
     
 
-@router.get("/login_student" , response_model=APIResponse)
+@router.post("/login_student" , response_model=APIResponse)
 async def login_student(
     enrollment_no : int = Body(...),
     password : str = Body(...)
@@ -62,19 +62,18 @@ async def login_student(
     """
     try:
         student = await Student.get_student(int(enrollment_no))
-        print(1)
+
         if not student:
             raise HTTPException(status_code=400, detail="Student does not exist")
-        print(2)
+
         if not PasswordHandle().verify_password(password, student['password']):
             raise HTTPException(status_code=400, detail="Invalid password")
-        print(3)
-        print(student)
-        print(type(student))
-        print(student['name'] , student["email"])
+        
         token = Token(user_id=str(student['enrollment_no']) , exp=60 , role="student").create_token()
-        print(4)
-        return APIResponse(status="success", 
+        print(token)
+
+        student['_id'] = str(student['_id'])
+        return APIResponse(status="success", status_code =200, 
                            message="Student logged in successfully" , 
                            data = student , token = token)
     except Exception as e:

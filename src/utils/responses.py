@@ -11,6 +11,7 @@ class APIResponse(BaseModel):
     message: str
     data: Optional[Any] = None
     status_code: int
+    token : str | None = None
 
     @classmethod
     def respond(cls , status_code : int , status : str , message : str , data : Optional[Any] = None , token : Optional[str] = None) -> JSONResponse:
