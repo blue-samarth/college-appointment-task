@@ -70,7 +70,6 @@ async def login_student(
             raise HTTPException(status_code=400, detail="Invalid password")
         
         token = Token(user_id=str(student['enrollment_no']) , exp=60 , role="student").create_token()
-        print(token)
 
         student['_id'] = str(student['_id'])
         return APIResponse(status="success", status_code =200, 

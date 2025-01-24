@@ -26,16 +26,10 @@ class Token(BaseModel):
             exp : datetime: Expiry time.
             role : str : Role.
         """
-        print(11)
         exp_time = datetime.now() + timedelta(minutes=self.exp)
-        print(12)
         token_data = self.model_dump()
         token_data["exp"] = str(exp_time.timestamp())
-        print(f"Expiry time", {token_data["exp"]} , {type(token_data['exp'])})
-        print(13)
-        print(f"{type(token_data['user_id'])} , {type(token_data['role'])}")
         token = jwt.encode(token_data, str(SECRET_KEY), algorithm="HS256")
-        print(14)
         return token
 
     @staticmethod
