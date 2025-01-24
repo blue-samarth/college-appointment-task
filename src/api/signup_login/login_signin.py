@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status , Request
+from fastapi import APIRouter, Depends, HTTPException, status , Request , Body
 from fastapi.responses import JSONResponse
 
 from src.models.student import Student
@@ -47,7 +47,10 @@ async def signup(student: Student) -> APIResponse:
     
 
 @router.get("/login_student" , response_model=APIResponse)
-async def login_student(request: Request) -> APIResponse:
+async def login_student(
+    enrollment_no : int = Body(...),
+    password : str = Body(...)
+) -> APIResponse:
     """
     It is a route that gets a student
     param enrollment_no: int: enrollment number
@@ -58,15 +61,22 @@ async def login_student(request: Request) -> APIResponse:
         }
     """
     try:
-        enrollment_no : int = request.query_params['enrollment_no']
-        password : str = request.query_params['password']
-        student = await Student.get_student(enrollment_no)
-        token = Token(user_id=student['enrollment_no'] , exp=datetime.now() , role="student").generate_token()
+        student = await Student.get_student(int(enrollment_no))
+        print(1)
         if not student:
             raise HTTPException(status_code=400, detail="Student does not exist")
+        print(2)
         if not PasswordHandle().verify_password(password, student['password']):
             raise HTTPException(status_code=400, detail="Invalid password")
-        return APIResponse(status="success", message="Student logged in successfully" , data = student , token = token)
+        print(3)
+        print(student)
+        print(type(student))
+        print(student['name'] , student["email"])
+        token = Token(user_id=str(student['enrollment_no']) , exp=60 , role="student").create_token()
+        print(4)
+        return APIResponse(status="success", 
+                           message="Student logged in successfully" , 
+                           data = student , token = token)
     except Exception as e:
         logging.error(f"Error in getting student: {e}")
         raise HTTPException(status_code=500, detail=f"Error in getting student: {e}")

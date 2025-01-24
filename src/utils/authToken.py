@@ -14,11 +14,11 @@ class Token(BaseModel):
     It is a class to generate and verify tokens.
     """
     user_id : str
-    exp : int
+    exp : int = 60
     role : str
 
     @classmethod
-    async def create_token(self) -> str:
+    def create_token(cls) -> str:
         """
         Constructor for baseToken class.
         Args:
@@ -26,8 +26,14 @@ class Token(BaseModel):
             exp : datetime: Expiry time.
             role : str : Role.
         """
-        self.exp = datetime.now() + timedelta(minutes=60)
-        token = jwt.encode(self.model_dump() , SECRET_KEY , algorithm="HS256")
+        print(11)
+        print(cls.model_dump())
+        exp = datetime.now() + timedelta(minutes=cls.exp)
+        print(12)
+        token_data = cls.model_dump()
+        print(13)
+        token = jwt.encode(token_data, SECRET_KEY, algorithm="HS256")
+        print(14)
         return token
 
     @staticmethod
