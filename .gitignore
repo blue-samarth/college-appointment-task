@@ -3,6 +3,7 @@
 
 .env
 .venv
+lint_check.txt
 
 # all the cache files
 *.log

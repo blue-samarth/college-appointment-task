@@ -1,8 +1,7 @@
 import logging
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status , Request , Body
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, HTTPException, Request , Body
 
 from src.models.student import Student
 from src.models.professor import Professor
