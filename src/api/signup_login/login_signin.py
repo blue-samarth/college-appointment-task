@@ -100,6 +100,7 @@ async def signup_prof(professor: Professor) -> APIResponse:
         professor = await Professor.create_professor(professor)
         return APIResponse(
             status="success", 
+            status_code=201,
             message="Professor created successfully",
             data = professor
             )

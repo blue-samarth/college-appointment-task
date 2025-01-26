@@ -1,5 +1,6 @@
 import logging
 import datetime
+from typing import Optional
 
 from bson import ObjectId
 
@@ -17,7 +18,7 @@ class Professor(BaseModel):
     name : str
     email : str
     password : str
-    time_slots : dict
+    time_slots : Optional[dict] = Field(default_factory=dict)
     created_at : datetime.datetime = Field(default_factory=datetime.datetime.now)
 
     @classmethod
@@ -42,7 +43,7 @@ class Professor(BaseModel):
             time_slots = {
                 f"{i}" : {"status": "free", "student_id": None} for i in range(8, 18)
             }
-            pre_exiting_prof = await db['professors'].findOne({"email" : professor.email})
+            pre_exiting_prof = await db['professors'].find_one({"email" : professor.email})
             if pre_exiting_prof :
                 raise HTTPException(status_code=400, detail="Professor Already Exists")
             professor_data = professor.model_dump()

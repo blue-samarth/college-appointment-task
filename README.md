@@ -54,6 +54,7 @@ Result :
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImV4cCI6IjE3Mzc3NDU0MTguMTczMDI0Iiwicm9sZSI6InN0dWRlbnQifQ.Z15zJT10GhxhP7z5_qCnEfbkoZ--7UKgpYZR08Z8mRI"
 }
 
+http://127.0.0.1:8000/api/v1/signup_prof
 localhost:8000/api/v1/signup_prof
 POST
 {
