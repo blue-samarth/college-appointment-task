@@ -80,6 +80,28 @@ class Professor(BaseModel):
             logging.error(f"Error in getting slot: {e}")
             raise HTTPException(status_code=500, detail=f"Error in getting slot: {e}")
         
+
+    @staticmethod
+    async def get_professor_by_email(prof_email : str) -> dict:
+        """
+        This is a static method that will search for the professor using the email
+        params:
+            email : str
+        returns:
+            professor : dict
+        Raises:
+
+        """
+        if not isinstance(prof_email, str):
+            raise ValueError(f"Was expecting a string value but instead receaived a {type(prof_email)}")
+        try : 
+            professor : Professor = await db["professors"].find_one({"email" : prof_email})
+            return professor
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error in getting Professor: {e}")
+
+
+        
     @staticmethod
     async def update_slot(professor_id: str, slot: str, enrollemnt_no : int) -> dict:
         """
