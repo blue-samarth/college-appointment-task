@@ -21,7 +21,7 @@ class Student(BaseModel):
     enrolled_courses: Optional[Dict[str, str]] = Field(default_factory=dict)
 
     @classmethod
-    async def create_student(cls , student) -> dict:
+    async def create_student(cls , student : BaseModel) -> dict:
         """
         It is a class method that creates a student
         param student: Student: student object

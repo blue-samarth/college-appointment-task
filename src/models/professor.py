@@ -42,7 +42,10 @@ class Professor(BaseModel):
             time_slots = {
                 f"{i}" : {"status": "free", "student_id": None} for i in range(8, 18)
             }
-            professor_data = professor.dict()
+            pre_exiting_prof = await db['professors'].findOne({"email" : professor.email})
+            if pre_exiting_prof :
+                raise HTTPException(status_code=400, detail="Professor Already Exists")
+            professor_data = professor.model_dump()
             professor_data['time_slots'] = time_slots
             result = await db["professors"].insert_one(professor_data)
             inserted_professor = await db["professors"].find_one({"_id": result.inserted_id})

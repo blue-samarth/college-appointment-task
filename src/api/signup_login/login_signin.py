@@ -98,7 +98,11 @@ async def signup_prof(professor: Professor) -> APIResponse:
     try:
         professor.password = PasswordHandle().get_password_hash(professor.password)
         professor = await Professor.create_professor(professor)
-        return APIResponse(status="success", message="Professor created successfully")
+        return APIResponse(
+            status="success", 
+            message="Professor created successfully",
+            data = professor
+            )
     except Exception as e:
         logging.error(f"Error in creating professor: {e}")
         raise HTTPException(status_code=500, detail=f"Error in creating professor: {e}")
